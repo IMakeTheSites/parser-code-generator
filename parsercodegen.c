@@ -27,6 +27,99 @@ Due Date: Friday, October 31, 2025 at 11:59 PM ET
 
 // STEP 1: PREPARATION AND SETUP
 
+// INCLUDES
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+// CONSTANTS
+#define MAX_SYMBOL_TABLE_SIZE 500
+#define MAX_CODE_LENGTH 500
+#define MAX_TOKENS 500
+
+// ENUMERATIONS - FROM lex.c FILE
+typedef enum 
+{
+    skipsym = 1,
+    identsym, 
+    numbersym,
+    plussym, 
+    minussym, 
+    multsym, 
+    slashsym,
+    eqsym, 
+    neqsym, 
+    lessym, 
+    leqsym, 
+    gtrsym, 
+    geqsym,
+    lparentsym, 
+    rparentsym, 
+    commasym, 
+    semicolonsym,
+    periodsym, 
+    becomessym,
+    beginsym, 
+    endsym, 
+    ifsym, 
+    fisym, 
+    thensym,
+    whilesym, 
+    dosym, 
+    callsym, 
+    constsym, 
+    varsym,
+    procsym, 
+    writesym,
+    readsym, 
+    elsesym, 
+    evensym
+} TokenType;
+
+// STRUCTS
+
+typedef struct 
+{
+    TokenType type;
+    char lexeme[12];
+} Token;
+
+typedef struct {
+    int mark;
+    int addr;
+    int level;
+    int kind;
+    char name[12];
+    int val;
+} symbol;
+
+typedef struct {
+    int l;
+    int m;
+    int op;
+} instruction;
+
+// IMPORTANT ARRAYS
+Token tokens[MAX_TOKENS];
+int tokenIndex = 0;
+int tokenCount = 0;
+Token currentToken;
+
+symbol symbol_table[MAX_SYMBOL_TABLE_SIZE];
+int symbolCount = 0;
+
+instruction code[MAX_CODE_LENGTH];
+int codeIndex = 0;
+
+// NAMES OF FILES
+const char *OUTPUT_FILE = "elf.txt";
+const char *TOKEN_FILE = "tokensPrint.txt"; // Matches lex.c output file
+
+// Function Prototypes
+
+
+
 // STEP 2: TOKEN FILE READER
 
 // STEP 3: SYMBOL TABLE IMPLEMENTATION
