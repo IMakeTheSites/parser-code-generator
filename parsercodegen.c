@@ -117,10 +117,78 @@ const char *OUTPUT_FILE = "elf.txt";
 const char *TOKEN_FILE = "tokensPrint.txt"; // Matches lex.c output file
 
 // Function Prototypes
+void factor(void);
+void term(void);
+void expression(void);
+void statement(void);
+void condition(void);
+void block(void);
+void const_declaration(void);
+void program(void);
+int var_declaration(void);
 
-
+void writeOutput(void);
+void emit(int op, int l, int m);
+void error(const char *msg);
+void nextToken(void);
+int symbol_table_check(char *name);
+void nextToken(void);
+void loadTokens(void);
 
 // STEP 2: TOKEN FILE READER
+void loadTokens()
+{
+    FILE *fp = fopen(TOKEN_FILE, "r");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "Error: cannot open token file '%s'\n", TOKEN_FILE);
+        exit(1);
+    }
+
+    tokenCount = 0;
+    while (!feof(fp))
+    {
+        int type;
+        if (fscanf(fp, "%d", &type) !=1)
+        break; // When the end of the file or malformed input comes, stop
+
+        tokens[tokenCount].type = (TokenType)type;
+        strcpy(tokens[tokenCount].lexeme, ""); // lexeme with nothing inside
+
+        // Identifier or number token, check the number/lexeme
+        if (type == identsym || type == numbersym)
+        {
+            if (fscanf(fp, "%11s", tokens[tokenCount].lexeme) != 1)
+            {
+                fprintf(stderr, "Error: token is malformed at the index %d\n", tokenCount);
+                fclose(fp);
+                exit(1);
+            }
+        }
+
+        tokenCount++;
+        if (tokenCount >= MAX_TOKENS)
+        {
+            fprintf(stderr, "Error: there are too many tokens (limit %d)\n", MAX_TOKENS);
+            fclose(fp);
+            exit(1);
+        }
+    }
+
+    fclose(fp);
+}
+
+// Proceed to next token
+void nextToken(void)
+{
+    if (tokenIndex < tokenCount)
+        currentToken = tokens[tokenIndex++];
+    else
+    {
+        currentToken.type = periodsym; // End of program at end of the file
+        strcpy(currentToken.lexeme, ".");
+    }
+}
 
 // STEP 3: SYMBOL TABLE IMPLEMENTATION
 
