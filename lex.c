@@ -1,27 +1,29 @@
 /*
-Assignment :
-lex - Lexical Analyzer for PL /0
+Assignment:
+HW3 - Parser and Code Generator for PL/0
 Author : < Dean Walker, Mark Wlodawski >
-Language : C ( only )
-To Compile :
-gcc - O2 - std = c11 -o lex lex . c
-To Execute ( on Eustis ):
-./ lex < input file >
-where :
-< input file > is the path to the PL /0 source program
-Notes :
-- Implement a lexical analyser for the PL /0 language .
-- The program must detect errors such as
-- numbers longer than five digits
-- identifiers longer than eleven characters
-- invalid characters .
-- The output format must exactly match the specification .
-- Tested on Eustis .
-Class : COP 3402 - System Software - Fall 2025
-Instructor : Dr . Jie Lin
-Due Date : Friday , October 3 , 2025 at 11:59 PM ET
+Language: C (only)
+To Compile:
+Scanner:
+gcc -O2 -std=c11 -o lex lex.c
+Parser/Code Generator:
+gcc -O2 -std=c11 -o parsercodegen parsercodegen.c
+To Execute (on Eustis):
+./lex <input_file.txt>
+./parsercodegen
+where:
+<input_file.txt> is the path to the PL/0 source program
+Notes:
+- lex.c accepts ONE command-line argument (input PL/0 source file)
+- parsercodegen.c accepts NO command-line arguments
+- Input filename is hard-coded in parsercodegen.c
+- Implements recursive-descent parser for PL/0 grammar
+- Generates PM/0 assembly code (see Appendix A for ISA)
+- All development and testing performed on Eustis
+Class: COP3402 - System Software - Fall 2025
+Instructor: Dr. Jie Lin
+Due Date: Friday, October 31, 2025 at 11:59 PM ET
 */
-
 // Included imports
 #include <stdio.h>
 #include <stdlib.h>
@@ -316,6 +318,7 @@ void scanAllTokens(void)
 // Print the three required sections
 void printResults(const char* fname) 
 {
+    /*
     // 1) Source Program
     printf("Source Program :\n\n");
     FILE* f = fopen(fname, "r");
@@ -325,7 +328,7 @@ void printResults(const char* fname)
         while ((c = fgetc(f)) != EOF) putchar(c);
         fclose(f);
     }
-
+    
     // 2) Lexeme Table with column spacing
     printf("\n\nLexeme Table :\n\n");
     printf("%-7s %-15s\n", "lexeme", "token type");
@@ -337,8 +340,9 @@ void printResults(const char* fname)
         else if (t->error == 3) printf("%-15s Invalid symbol\n", t->lexeme);
         else                    printf("%-7s %-15d\n", t->lexeme, t->type);
     }
+    */
 
-    // Print the token List
+    // Print the token List to the FILE
     FILE* outFile = fopen("tokensPrint.txt", "w");
     if (outFile == NULL) {
         perror("Error creating token file");

@@ -1,7 +1,7 @@
 /*
 Assignment:
 HW3 - Parser and Code Generator for PL/0
-Author(s): Dean Walker, Mark Wlodawski
+Author : < Dean Walker, Mark Wlodawski >
 Language: C (only)
 To Compile:
 Scanner:
@@ -116,6 +116,25 @@ int codeIndex = 0;
 const char *OUTPUT_FILE = "elf.txt";
 const char *TOKEN_FILE = "tokensPrint.txt"; // Matches lex.c output file
 
+// The Error Messages
+const char *ERRORS[] = {
+    "Error: program must end with period", // 1
+    "Error: const, var, and read keywords must be followed by identifier", // 2
+    "Error: symbol name has already been declared", // 3
+    "Error: constants must be assigned with =", // 4
+    "Error: constants must be assigned an integer value", // 5
+    "Error: constant and variable declarations must be followed by a semicolon", // 6
+    "Error: undeclared identifier", // 7
+    "Error: only variable values may be altered", // 8
+    "Error: assignment statements must use :=", // 9
+    "Error: begin must be followed by end", // 10
+    "Error: if must be followed by then", // 11
+    "Error: while must be followed by do", // 12
+    "Error: condition must contain comparison operator", // 13
+    "Error: right parenthesis must follow left parenthesis", // 14
+    "Error: arithmetic equations must contain operands, parentheses, numbers, or symbols", // 15
+};
+
 // Function Prototypes
 void factor(void);
 void term(void);
@@ -129,7 +148,7 @@ int var_declaration(void);
 
 void writeOutput(void);
 void emit(int op, int l, int m);
-void error(const char *msg);
+void error(numError);
 void nextToken(void);
 int symbol_table_check(char *name);
 void nextToken(void);
@@ -190,7 +209,49 @@ void nextToken(void)
     }
 }
 
+// Reporting Errors
+void error(int numError) {
+    const char *msg = ERRORS[numError];
+    printf("%s\n", msg); // Terminal shows error message
+
+    FILE *fp = fopen(OUTPUT_FILE, "w"); // elf.txt receives output
+    if (fp) {
+        fprintf(fp, "%s\n", msg);
+        fclose(fp);
+    }
+    exit(1);
+}
+
 // STEP 3: SYMBOL TABLE IMPLEMENTATION
+int symbol_table_check(char *name) {
+    for (int i = 0; i < symbolCount; i++) {
+        if (symbol_table[i].mark == 0 && strcmp(symbol_table[i].name, name) == 0) {
+            return i; // Symbol is found
+        }
+    }
+    return -1; // Symbol is not found
+}
+
+int get_symbol_index(char *name) {
+    int index = symbol_table_check(name);
+    if (index == -1) {
+        error(7); // Error number 7
+    }
+    return index;
+}
+
+void symbol_table_add(int kind, char *name, int val, int level, int addr) {
+    if (symbol_table_check(name) != -1) {
+        error(3); // Error number 3
+    }
+    symbol_table[symbolCount].kind = kind;
+    strcpy(symbol_table[symbolCount].name, name);
+    symbol_table[symbolCount].val = val;
+    symbol_table[symbolCount].level = level;
+    symbol_table[symbolCount].addr = addr;
+    symbol_table[symbolCount].mark = 0; // An available mark
+    symbolCount++;
+}
 
 // STEP 4: CODE GENERATION HELPER
 
